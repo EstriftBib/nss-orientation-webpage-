@@ -1,482 +1,473 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>NSS NIT Silchar — Mobile Brochure</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSS NIT Silchar — UG 2026–2030</title>
   <style>
-    :root { --navy:#082477; --paper:#f8f6f1; }
-    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#060f31; position:fixed; }
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    #app { width:100vw; height:100dvh; position:relative; overflow:hidden; background:
-      radial-gradient(circle at 50% 10%, rgba(255,255,255,.11), transparent 34%),
-      linear-gradient(135deg,#040b25 0%,#0a1747 48%,#03081e 100%); }
-    #book-viewport {
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      perspective:1600px;
+    :root {
+      --bg: #001030;
+      --button-bg: rgba(255, 255, 255, 0.16);
+      --button-hover: rgba(255, 255, 255, 0.28);
+      --dot: rgba(255, 255, 255, 0.45);
+      --dot-active: #fff;
     }
-    #book-scale {
-      position:relative;
-      width:1040px;
-      height:820px;
-      transform-origin:center center;
-      will-change:transform;
-      display:grid;
-      place-items:center;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    #book-stage {
-      position:relative;
-      width:1040px;
-      height:820px;
-      transform-style:preserve-3d;
-      perspective:1400px;
-      overflow:visible;
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
-    .panel-shell {
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:329.7px;
-      height:700px;
-      margin:0;
-      transform-style:preserve-3d;
-      transform-origin:center center;
-      overflow:visible;
-      will-change:transform, opacity;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
     }
-    .panel-shell img {
-      display:block;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      border-radius:4px;
-      user-select:none;
-      -webkit-user-drag:none;
-      box-shadow:0 16px 32px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.2);
+
+    .carousel {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      perspective: 2000px;
     }
-    .crease {
-      position:absolute;
-      top:0;
-      bottom:0;
-      width:18px;
-      pointer-events:none;
-      opacity:0;
-      background:linear-gradient(90deg,transparent,rgba(0,0,0,.28),rgba(255,255,255,.22),transparent);
-      filter:blur(1px);
-      transform:translateZ(2px);
+
+    .viewport {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    #assembled {
-      z-index:100;
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:1000px;
-      height:auto;
-      transform:translate(-50%,-50%);
-      display:block;
-      transform-style:preserve-3d;
-      transform-origin:center center;
-      will-change:transform,opacity;
+
+    /* Group Stage Container for 3-Panel Unfolds */
+    .group-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 400ms ease, visibility 0s linear 400ms;
     }
-    #assembled img {
-      display:block;
-      width:100%;
-      height:auto;
-      margin:0;
-      padding:0;
-      border-radius:4px;
-      box-shadow:0 20px 40px rgba(0,0,0,.4);
+
+    .group-stage.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 400ms ease, visibility 0s;
     }
-    #assembled.hidden { display:none; }
-    .grain { position:absolute; inset:0; pointer-events:none; opacity:.05; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); mix-blend-mode:screen; }
+
+    /* Seamless Connected Panel Strip */
+    .panel-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+    }
+
+    /* Individual Panels with Zero Gaps */
+    .panel {
+      position: relative;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform-origin: left center;
+      transform: rotateY(-70deg) scale(0.85);
+      transition: 
+        max-width 600ms cubic-bezier(0.25, 1, 0.5, 1),
+        opacity 500ms ease,
+        transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Revealed state: Expands panel into the row */
+    .panel.revealed {
+      max-width: 32vw;
+      opacity: 1;
+      transform: rotateY(0deg) scale(1);
+    }
+
+    .panel img {
+      display: block;
+      height: 85vh;
+      width: auto;
+      max-width: 32vw;
+      object-fit: contain;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Standalone Slide 7 */
+    .slide-standalone {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.9) rotateY(20deg);
+      transition: transform 600ms cubic-bezier(0.25, 1, 0.5, 1), opacity 400ms ease, visibility 0s linear 400ms;
+      pointer-events: none;
+    }
+
+    .slide-standalone.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) rotateY(0deg);
+      transition: transform 600ms cubic-bezier(0.25, 1, 0.5, 1), opacity 400ms ease, visibility 0s;
+      pointer-events: auto;
+    }
+
+    .slide-standalone img {
+      display: block;
+      max-width: 100vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, .35);
+    }
+
+    /* Navigation Controls */
     .nav {
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:48px;
-      height:48px;
-      background:rgba(255,255,255,.1);
-      border:1px solid rgba(255,255,255,.2);
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      color:#fff;
-      z-index:10;
-      backdrop-filter:blur(4px);
-      cursor:pointer;
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px;
+      height: 52px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 50%;
+      background: var(--button-bg);
+      color: #fff;
+      font-size: 34px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background .2s, transform .2s;
     }
-    #prev { left:12px; }
-    #next { right:12px; }
-    .hint {
-      position:absolute;
-      bottom:max(16px, env(safe-area-inset-bottom));
-      left:50%;
-      transform:translateX(-50%);
-      color:rgba(255,255,255,.6);
-      font-size:11px;
-      letter-spacing:.5px;
-      pointer-events:none;
-      white-space:nowrap;
-      z-index:10;
+
+    .nav:hover {
+      background: var(--button-hover);
+    }
+
+    .nav:active {
+      transform: translateY(-50%) scale(.94);
+    }
+
+    .nav.left { left: 22px; }
+    .nav.right { right: 22px; }
+
+    .dots {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 9px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: var(--dot);
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+    }
+
+    .dot.active {
+      background: var(--dot-active);
+      transform: scale(1.45);
+    }
+
+    .counter {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      z-index: 10;
+      font-size: 13px;
+      letter-spacing: .08em;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      color: rgba(255,255,255,.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 700px) {
+      .panel.revealed {
+        max-width: 33vw;
+      }
+
+      .panel img {
+        height: 75vh;
+        max-width: 33vw;
+      }
+
+      .nav {
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
+        background: rgba(0,0,0,.35);
+      }
+
+      .nav.left { left: 10px; }
+      .nav.right { right: 10px; }
+
+      .dots {
+        bottom: max(14px, env(safe-area-inset-bottom));
+      }
+
+      .counter {
+        top: 12px;
+        right: 12px;
+        font-size: 11px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .group-stage,
+      .panel,
+      .slide-standalone {
+        transition: opacity 150ms ease !important;
+        transform: none !important;
+      }
     }
   </style>
 </head>
 <body>
-<div id="app">
-  <div class="grain"></div>
-  <div id="book-viewport">
-    <div id="book-scale">
-      <div id="book-stage" aria-live="polite">
-        <div id="assembled" class="hidden" aria-hidden="true">
-          <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0001_amyxwb.jpg" alt="NSS brochure inside spread" draggable="false">
-          <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0002_unqraw.jpg" alt="NSS brochure outside spread" draggable="false">
+  <main class="carousel" aria-label="NSS NIT Silchar information slideshow">
+    <div class="viewport" id="viewport">
+      
+      <!-- Group Stage 1: Panels 1 to 3 (Reveals 1, then 1+2, then 1+2+3 together) -->
+      <div class="group-stage active" id="group-1">
+        <div class="panel-strip">
+          <figure class="panel revealed" id="p1">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653201/panel1_uakzha.jpg" alt="NSS NIT Silchar welcome poster for UG 2026–2030 batch">
+          </figure>
+          <figure class="panel" id="p2">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel4_lmy6vm.jpg" alt="NSS NIT Silchar about us, motto and major activities">
+          </figure>
+          <figure class="panel" id="p3">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel6_iede51.jpg" alt="NSS benefits and common questions and answers">
+          </figure>
         </div>
       </div>
+
+      <!-- Group Stage 2: Panels 4 to 6 (Reveals 4, then 4+5, then 4+5+6 together) -->
+      <div class="group-stage" id="group-2">
+        <div class="panel-strip">
+          <figure class="panel" id="p4">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653231/panel5_euwjxf.jpg" alt="NSS NIT Silchar event gallery">
+          </figure>
+          <figure class="panel" id="p5">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653230/panel3_puvzen.jpg" alt="NSS orientation and recruitment process">
+          </figure>
+          <figure class="panel" id="p6">
+            <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel2_cvw1fs.jpg" alt="NSS NIT Silchar contact details and social media">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Slide 7: Standalone Brochure -->
+      <figure class="slide-standalone" id="slide-7">
+        <img src="https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787664130/image_aktfyd.jpg" alt="NSS Brochure for UG 2026–2030 batch">
+      </figure>
+
     </div>
-  </div>
-  <button id="prev" class="nav" aria-label="Previous step">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
-  <button id="next" class="nav" aria-label="Next step">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-  </button>
-  <div class="hint" id="hint">Swipe left or right to explore</div>
-</div>
-<script>
-(() => {
-  const STAGE_W = 1040, STAGE_H = 820, PANEL_H = 700, PANEL_W = PANEL_H * .471;
-  const viewport = document.querySelector('#book-viewport');
-  const scaleWrap = document.querySelector('#book-scale');
-  const stage = document.querySelector('#book-stage');
-  const assembled = document.querySelector('#assembled');
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const panels = {
-    p1:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653201/panel1_uakzha.jpg', 
-    p2:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel4_lmy6vm.jpg', 
-    p3:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel6_iede51.jpg',
-    p4:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653231/panel5_euwjxf.jpg', 
-    p5:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653230/panel3_puvzen.jpg', 
-    p6:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel2_cvw1fs.jpg'
-  };
+    <button class="nav left" id="prev" aria-label="Previous slide" title="Previous slide">&#10094;</button>
+    <button class="nav right" id="next" aria-label="Next slide" title="Next slide">&#10095;</button>
 
-  let state = 0, animating = false;
-  let touchX = 0, touchT = 0, lastX = 0, lastT = 0;
+    <div class="counter" id="counter" aria-live="polite">1 / 7</div>
 
-  function getContentMetrics(step = state) {
-    if (step === 6) {
-      return { width:1000, height:1000 * 1448 / 2047 * 2 };
-    }
-    const count = (step === 0 || step === 3) ? 1 : (step === 1 || step === 4) ? 2 : 3;
-    return {
-      width: Math.max(PANEL_W, count * PANEL_W),
-      height: PANEL_H
-    };
-  }
+    <nav class="dots" aria-label="Slide navigation">
+      <button class="dot active" aria-label="Go to slide 1"></button>
+      <button class="dot" aria-label="Go to slide 2"></button>
+      <button class="dot" aria-label="Go to slide 3"></button>
+      <button class="dot" aria-label="Go to slide 4"></button>
+      <button class="dot" aria-label="Go to slide 5"></button>
+      <button class="dot" aria-label="Go to slide 6"></button>
+      <button class="dot" aria-label="Go to slide 7"></button>
+    </nav>
+  </main>
 
-  function fitBook(step = state, animate = false) {
-    const w = Math.max(1, viewport.clientWidth);
-    const h = Math.max(1, viewport.clientHeight);
-    const metrics = getContentMetrics(step);
+  <script>
+    (() => {
+      const TOTAL_SLIDES = 7;
+      let current = 0;
+      let isAnimating = false;
+      let touchStartX = 0;
+      let touchStartY = 0;
 
-    const horizontalPadding = 16;
-    const verticalPadding = 90;
+      const group1 = document.getElementById("group-1");
+      const group2 = document.getElementById("group-2");
+      const slide7 = document.getElementById("slide-7");
 
-    let sx = (w - horizontalPadding) / metrics.width;
-    let sy = (h - verticalPadding) / metrics.height;
-    let scale = Math.min(sx, sy);
-    if (step === 0 || step === 3) scale = Math.min(scale, 1);
-    scale = Math.max(0.15, scale);
+      const p1 = document.getElementById("p1");
+      const p2 = document.getElementById("p2");
+      const p3 = document.getElementById("p3");
+      const p4 = document.getElementById("p4");
+      const p5 = document.getElementById("p5");
+      const p6 = document.getElementById("p6");
 
-    const vars = { width:1040, height:820, scale };
-    if (animate) gsap.to(scaleWrap, { ...vars, duration:0.3, ease:"power2.out", overwrite:true });
-    else gsap.set(scaleWrap, vars);
+      const dots = [...document.querySelectorAll(".dot")];
+      const prevButton = document.getElementById("prev");
+      const nextButton = document.getElementById("next");
+      const viewport = document.getElementById("viewport");
+      const counter = document.getElementById("counter");
 
-    if (step === 6) fitAssembled(false);
-  }
+      function update(nextIndex) {
+        if (isAnimating || nextIndex === current) return;
+        isAnimating = true;
 
-  function fitAssembled(animate = false) {
-    const w = Math.max(1, viewport.clientWidth);
-    const h = Math.max(1, viewport.clientHeight);
-    const naturalW = 1000;
-    const naturalH = naturalW * 1448 / 2047 * 2;
+        // Loop after slide 7 back to slide 1 (Index 0)
+        current = (nextIndex + TOTAL_SLIDES) % TOTAL_SLIDES;
 
-    const scale = Math.max(
-      0.12,
-      Math.min(
-        (w - 20) / naturalW,
-        (h - 80) / naturalH
-      )
-    );
+        // Deactivate all stages initially
+        group1.classList.remove("active");
+        group2.classList.remove("active");
+        slide7.classList.remove("active");
 
-    if (animate) {
-      gsap.to(assembled, { scale, duration:0.3, ease:"power2.out", overwrite:true });
-    } else {
-      gsap.set(assembled, { scale });
-    }
-  }
-
-  function centerStage() {
-    gsap.set(stage, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
-    gsap.set(scaleWrap, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
-  }
-
-  window.addEventListener('resize', () => fitBook(state, true));
-  window.addEventListener('orientationchange', () => setTimeout(() => fitBook(state, true), 150));
-
-  function clearPanels() { 
-    stage.querySelectorAll('.panel-shell').forEach(el => {
-      gsap.killTweensOf(el);
-      el.remove();
-    }); 
-  }
-  
-  const imageCache = new Map();
-
-  function preloadImage(src) {
-    if (imageCache.has(src)) return imageCache.get(src);
-    const promise = new Promise(resolve => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.onload = async () => {
-        try { if (img.decode) await img.decode(); } catch (_) {}
-        resolve();
-      };
-      img.onerror = () => resolve();
-      img.src = src;
-      if (img.complete) {
-        Promise.resolve(img.decode ? img.decode().catch(()=>{}) : null).then(resolve);
-      }
-    });
-    imageCache.set(src, promise);
-    return promise;
-  }
-
-  Object.values(panels).forEach(preloadImage);
-  preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0002_unqraw.jpg');
-  preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0001_amyxwb.jpg');
-
-  async function ensureImage(src) {
-    await preloadImage(src);
-  }
-
-  function makePanel(key, x, z=0, rot=0, hinge='center', hidden=false) {
-    const el = document.createElement('div');
-    el.className = 'panel-shell';
-    el.dataset.key = key;
-    el.style.left = '50%';
-    el.style.marginLeft = '0px';
-    el.style.zIndex = String(10 + Math.round(z));
-    el.style.transformOrigin = hinge === 'left' ? 'left center' : hinge === 'right' ? 'right center' : 'center center';
-    el.style.transform = `translate(-50%,-50%) translateX(${x}px) translateZ(${z}px) rotateY(${rot}deg)`;
-    if (hidden) el.style.opacity = '0';
-    const img = document.createElement('img');
-    img.src = panels[key];
-    img.alt = `NSS brochure ${key}`;
-    img.draggable = false;
-    img.decoding = 'async';
-    img.loading = 'eager';
-    el.appendChild(img);
-    const crease = document.createElement('div');
-    crease.className = 'crease';
-    crease.style.left = rot ? 'auto' : 'calc(100% - 9px)';
-    el.appendChild(crease);
-    stage.appendChild(el);
-    return el;
-  }
-
-  async function revealPanels(root=stage) {
-    const imgs = [...root.querySelectorAll('.panel-shell img')];
-    await Promise.all(imgs.map(async img => {
-      const src = img.currentSrc || img.src;
-      await ensureImage(src);
-      try { if (img.decode) await img.decode(); } catch (_) {}
-    }));
-  }
-
-  function groupPositions(count) {
-    const total = count * PANEL_W;
-    const start = -total / 2 + PANEL_W / 2;
-    return Array.from({length:count}, (_, i) => start + i * PANEL_W);
-  }
-
-  async function renderStatic(s) {
-    gsap.killTweensOf(stage.querySelectorAll('.panel-shell'));
-    gsap.killTweensOf([stage, scaleWrap, assembled]);
-    clearPanels();
-    centerStage();
-    gsap.set(assembled, {opacity:0, rotationY:0, scale:1});
-    assembled.classList.add('hidden');
-    assembled.setAttribute('aria-hidden', 'true');
-
-    if (s === 0) {
-      const p = makePanel('p1', 0, 0, 0, 'center', true);
-      await revealPanels(stage);
-      gsap.set(p, {x:0, y:0, rotationY:0, opacity:1, scale:1});
-      return;
-    }
-    if (s === 1) { const xs = groupPositions(2); makePanel('p2', xs[0]); makePanel('p1', xs[1]); await revealPanels(stage); return; }
-    if (s === 2) { const xs = groupPositions(3); makePanel('p3', xs[0]); makePanel('p2', xs[1]); makePanel('p1', xs[2]); await revealPanels(stage); return; }
-    if (s === 3) {
-      const p = makePanel('p4', 0, 0, 0, 'center', true);
-      await revealPanels(stage);
-      gsap.set(p, {x:0, y:0, rotationY:0, opacity:1, scale:1});
-      return;
-    }
-    if (s === 4) { const xs = groupPositions(2); makePanel('p5', xs[0]); makePanel('p4', xs[1]); await revealPanels(stage); return; }
-    if (s === 5) { const xs = groupPositions(3); makePanel('p6', xs[0]); makePanel('p5', xs[1]); makePanel('p4', xs[2]); await revealPanels(stage); return; }
-    if (s === 6) {
-      clearPanels();
-      assembled.classList.remove('hidden');
-      assembled.setAttribute('aria-hidden', 'false');
-      gsap.set(assembled, {opacity:1, rotationY:0});
-      fitAssembled(false);
-      return;
-    }
-  }
-
-  async function animateTo(nextState, dir) {
-    if (animating) return;
-    animating = true;
-    const old = state;
-    const motion = d => reduced ? 0.01 : d;
-
-    try {
-      if (nextState === 6) {
-        gsap.killTweensOf(stage.querySelectorAll('.panel-shell'));
-        clearPanels();
-        assembled.classList.remove('hidden');
-        assembled.setAttribute('aria-hidden', 'false');
-        gsap.set(assembled, {opacity:0, scale:.95, rotationY:dir>0?3:-3});
-        fitAssembled(false);
-        await new Promise(resolve => gsap.to(assembled, {opacity:1, scale:1, rotationY:0, duration:motion(.45), ease:'power3.out', onComplete:resolve}));
-        state = nextState;
-        return;
-      }
-      if (old === 6) {
-        gsap.killTweensOf(assembled);
-        gsap.set(assembled, {opacity:0});
-        assembled.classList.add('hidden');
-        assembled.setAttribute('aria-hidden', 'true');
-        state = nextState;
-        await renderStatic(nextState);
-        return;
-      }
-
-      const oldPanels = [...stage.querySelectorAll('.panel-shell')];
-      const incomingKey = {1:'p2', 2:'p3', 3:'p4', 4:'p5', 5:'p6'}[nextState];
-
-      if (dir < 0) {
-        if (old === 1 || old === 4) {
-          const left = oldPanels[0], right = oldPanels[1];
-          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
-            .to(left, {rotationY:-90, opacity:0, duration:motion(.45)}, 0)
-            .to(right, {x:0, duration:motion(.45)}, 0));
-          state = nextState; await renderStatic(nextState); return;
+        // Slide 1 (Index 0): Show Group 1 (Panel 1 only)
+        if (current === 0) {
+          group1.classList.add("active");
+          p1.classList.add("revealed");
+          p2.classList.remove("revealed");
+          p3.classList.remove("revealed");
+        } 
+        // Slide 2 (Index 1): Show Group 1 (Panels 1 + 2 side-by-side)
+        else if (current === 1) {
+          group1.classList.add("active");
+          p1.classList.add("revealed");
+          p2.classList.add("revealed");
+          p3.classList.remove("revealed");
+        } 
+        // Slide 3 (Index 2): Show Group 1 (Panels 1 + 2 + 3 together)
+        else if (current === 2) {
+          group1.classList.add("active");
+          p1.classList.add("revealed");
+          p2.classList.add("revealed");
+          p3.classList.add("revealed");
+        } 
+        // Slide 4 (Index 3): Show Group 2 (Panel 4 only)
+        else if (current === 3) {
+          group2.classList.add("active");
+          p4.classList.add("revealed");
+          p5.classList.remove("revealed");
+          p6.classList.remove("revealed");
+        } 
+        // Slide 5 (Index 4): Show Group 2 (Panels 4 + 5 side-by-side)
+        else if (current === 4) {
+          group2.classList.add("active");
+          p4.classList.add("revealed");
+          p5.classList.add("revealed");
+          p6.classList.remove("revealed");
+        } 
+        // Slide 6 (Index 5): Show Group 2 (Panels 4 + 5 + 6 together)
+        else if (current === 5) {
+          group2.classList.add("active");
+          p4.classList.add("revealed");
+          p5.classList.add("revealed");
+          p6.classList.add("revealed");
+        } 
+        // Slide 7 (Index 6): Show Standalone Brochure
+        else if (current === 6) {
+          slide7.classList.add("active");
         }
-        if (old === 2 || old === 5) {
-          const oldTwo = groupPositions(2);
-          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
-            .to(oldPanels[0], {rotationY:-90, opacity:0, duration:motion(.45)}, 0)
-            .to(oldPanels[1], {x:oldTwo[0], duration:motion(.45)}, 0)
-            .to(oldPanels[2], {x:oldTwo[1], duration:motion(.45)}, 0));
-          state = nextState; await renderStatic(nextState); return;
-        }
-        if (old === 3) {
-          await new Promise(resolve => gsap.to(oldPanels, {opacity:0, scale:.98, duration:motion(.2), onComplete:resolve}));
-          state = nextState; await renderStatic(nextState); return;
-        }
-      }
 
-      // Standalone -> 2 panels
-      if (old === 0 || old === 3) {
-        const xs = groupPositions(2), existing = oldPanels[0];
-        await ensureImage(panels[incomingKey]);
-        const incoming = makePanel(incomingKey, xs[0], -10, 90, 'right', true);
-        gsap.set(existing, {x:0, opacity:1, rotationY:0, scale:1});
-        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
-          .to(existing, {x:xs[1], duration:motion(.5)}, 0)
-          .set(incoming, {opacity:1}, motion(.08))
-          .to(incoming, {rotationY:0, duration:motion(.55)}, motion(.08)));
-        state = nextState; await renderStatic(nextState); return;
-      }
-
-      // 2 panels -> 3 panels
-      if (old === 1 || old === 4) {
-        const xs = groupPositions(3), oldTwo = groupPositions(2);
-        await ensureImage(panels[incomingKey]);
-        const incoming = makePanel(incomingKey, xs[0], -10, 90, 'right', true);
-        
-        oldPanels.forEach((p, idx) => {
-          gsap.set(p, {x: oldTwo[idx], y:0, opacity:1, rotationY:0, scale:1});
+        // Update active dots and top counter
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === current);
+          dot.setAttribute("aria-current", index === current ? "true" : "false");
         });
 
-        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
-          .to(oldPanels[0], {x: xs[1], duration:motion(.5)}, 0)
-          .to(oldPanels[1], {x: xs[2], duration:motion(.5)}, 0)
-          .set(incoming, {opacity:1}, motion(.08))
-          .to(incoming, {rotationY:0, duration:motion(.55)}, motion(.08)));
-        state = nextState; await renderStatic(nextState); return;
+        counter.textContent = `${current + 1} / ${TOTAL_SLIDES}`;
+
+        setTimeout(() => {
+          isAnimating = false;
+        }, 600);
       }
 
-      if (old === 2 && nextState === 3) {
-        await new Promise(resolve => gsap.to(oldPanels, {opacity:0, scale:.98, duration:motion(.2), stagger:.01, onComplete:resolve}));
-        state = nextState; await renderStatic(nextState); return;
+      function goNext() {
+        update(current + 1);
       }
 
-      state = nextState;
-      await renderStatic(nextState);
-    } finally {
-      animating = false;
-      fitBook(state, false);
-    }
-  }
+      function goPrev() {
+        update(current - 1);
+      }
 
-  function go(delta) { 
-    if (animating) return;
-    const next = (state + delta + 7) % 7; 
-    fitBook(next, true);
-    animateTo(next, delta); 
-  }
+      nextButton.addEventListener("click", goNext);
+      prevButton.addEventListener("click", goPrev);
 
-  document.querySelector('#next').addEventListener('click', () => go(1));
-  document.querySelector('#prev').addEventListener('click', () => go(-1));
+      dots.forEach((dot, index) => {
+        dot.addEventListener("click", () => update(index));
+      });
 
-  viewport.addEventListener('touchstart', e => { 
-    const t = e.changedTouches[0]; 
-    touchX = lastX = t.clientX; 
-    touchT = lastT = performance.now(); 
-  }, {passive:true});
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          goNext();
+        } else if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          goPrev();
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          update(0);
+        } else if (event.key === "End") {
+          event.preventDefault();
+          update(TOTAL_SLIDES - 1);
+        }
+      });
 
-  viewport.addEventListener('touchmove', e => { 
-    const t = e.changedTouches[0]; 
-    lastX = t.clientX; 
-    lastT = performance.now(); 
-  }, {passive:true});
+      viewport.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
 
-  viewport.addEventListener('touchend', () => { 
-    const dx = lastX - touchX, dt = Math.max(1, lastT - touchT), velocity = Math.abs(dx / dt); 
-    if (Math.abs(dx) > 35 || velocity > 0.3) go(dx < 0 ? 1 : -1); 
-  }, {passive:true});
+      viewport.addEventListener("touchend", (event) => {
+        const touch = event.changedTouches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
 
-  (async () => {
-    await Promise.all(Object.values(panels).map(preloadImage));
-    await preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0002_unqraw.jpg');
-    await preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0001_amyxwb.jpg');
-    await renderStatic(0);
-    fitBook(0, false);
-  })();
-})();
-</script>
+        if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+
+        if (dx < 0) goNext();
+        else goPrev();
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>
