@@ -49,7 +49,9 @@
       transform-style:preserve-3d;
       transform-origin:center center;
       overflow:visible;
-      will-change:transform,opacity;
+      will-change:transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .panel-shell img {
       display:block;
@@ -60,8 +62,6 @@
       border-radius:4px;
       user-select:none;
       -webkit-user-drag:none;
-      backface-visibility:hidden;
-      -webkit-backface-visibility:hidden;
       box-shadow:0 16px 32px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.2);
     }
     .crease {
@@ -113,6 +113,7 @@
       color:#fff;
       z-index:10;
       backdrop-filter:blur(4px);
+      cursor:pointer;
     }
     #prev { left:12px; }
     #next { right:12px; }
@@ -233,7 +234,13 @@
   window.addEventListener('resize', () => fitBook(state, true));
   window.addEventListener('orientationchange', () => setTimeout(() => fitBook(state, true), 150));
 
-  function clearPanels() { stage.querySelectorAll('.panel-shell').forEach(el => el.remove()); }
+  function clearPanels() { 
+    stage.querySelectorAll('.panel-shell').forEach(el => {
+      gsap.killTweensOf(el);
+      el.remove();
+    }); 
+  }
+  
   const imageCache = new Map();
 
   function preloadImage(src) {
@@ -378,7 +385,7 @@
           state = nextState; await renderStatic(nextState); return;
         }
         if (old === 2 || old === 5) {
-          const oldTwo = groupPositions(2), oldThree = groupPositions(3);
+          const oldTwo = groupPositions(2);
           await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
             .to(oldPanels[0], {rotationY:-90, opacity:0, duration:motion(.45)}, 0)
             .to(oldPanels[1], {x:oldTwo[0], duration:motion(.45)}, 0)
@@ -404,13 +411,12 @@
         state = nextState; await renderStatic(nextState); return;
       }
 
-      // 2 panels -> 3 panels (FIXED ghosting/flicker by removing abrupt x reset on old panels)
+      // 2 panels -> 3 panels
       if (old === 1 || old === 4) {
         const xs = groupPositions(3), oldTwo = groupPositions(2);
         await ensureImage(panels[incomingKey]);
         const incoming = makePanel(incomingKey, xs[0], -10, 90, 'right', true);
         
-        // Keep existing panels at their current respective positions without snapping to 0
         oldPanels.forEach((p, idx) => {
           gsap.set(p, {x: oldTwo[idx], y:0, opacity:1, rotationY:0, scale:1});
         });
@@ -436,7 +442,13 @@
     }
   }
 
-  function go(delta) { const next = (state + delta + 7) % 7; animateTo(next, delta); }
+  function go(delta) { 
+    if (animating) return;
+    const next = (state + delta + 7) % 7; 
+    fitBook(next, true);
+    animateTo(next, delta); 
+  }
+
   document.querySelector('#next').addEventListener('click', () => go(1));
   document.querySelector('#prev').addEventListener('click', () => go(-1));
 
