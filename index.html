@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>NSS NIT Silchar — Interactive Brochure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NSS NIT Silchar — Mobile Brochure</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     :root { --navy:#082477; --paper:#f8f6f1; }
-    * { box-sizing:border-box; }
-    html,body { width:100%; height:100%; margin:0; overflow:hidden; background:#060f31; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#060f31; position:fixed; }
     body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    button { -webkit-tap-highlight-color:transparent; }
     #app { width:100vw; height:100dvh; position:relative; overflow:hidden; background:
       radial-gradient(circle at 50% 10%, rgba(255,255,255,.11), transparent 34%),
       linear-gradient(135deg,#040b25 0%,#0a1747 48%,#03081e 100%); }
@@ -23,7 +22,6 @@
       overflow:hidden;
       perspective:1600px;
     }
-
     #book-scale {
       position:relative;
       width:1040px;
@@ -33,7 +31,6 @@
       display:grid;
       place-items:center;
     }
-
     #book-stage {
       position:relative;
       width:1040px;
@@ -42,7 +39,6 @@
       perspective:1400px;
       overflow:visible;
     }
-
     .panel-shell {
       position:absolute;
       top:50%;
@@ -55,32 +51,19 @@
       overflow:visible;
       will-change:transform,opacity;
     }
-
     .panel-shell img {
       display:block;
       width:100%;
       height:100%;
       object-fit:cover;
       object-position:center;
-      border-radius:2px;
+      border-radius:4px;
       user-select:none;
       -webkit-user-drag:none;
       backface-visibility:hidden;
-      box-shadow:0 22px 45px rgba(0,0,0,.28),0 3px 9px rgba(0,0,0,.18);
+      -webkit-backface-visibility:hidden;
+      box-shadow:0 16px 32px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.2);
     }
-
-    .panel-shell::after {
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:linear-gradient(90deg,rgba(0,0,0,.18),transparent 14%,transparent 86%,rgba(0,0,0,.12));
-      opacity:0;
-      transition:opacity .15s;
-    }
-
-    .panel-shell.is-folding::after { opacity:1; }
-
     .crease {
       position:absolute;
       top:0;
@@ -92,12 +75,6 @@
       filter:blur(1px);
       transform:translateZ(2px);
     }
-
-    .stage-single .panel-shell {
-      left:50%;
-      transform:translate(-50%,-50%);
-    }
-
     #assembled {
       z-index:100;
       position:absolute;
@@ -109,32 +86,48 @@
       display:block;
       transform-style:preserve-3d;
       transform-origin:center center;
+      will-change:transform,opacity;
     }
-
     #assembled img {
       display:block;
       width:100%;
       height:auto;
       margin:0;
       padding:0;
-      line-height:0;
-      box-shadow:none;
+      border-radius:4px;
+      box-shadow:0 20px 40px rgba(0,0,0,.4);
     }
-
     #assembled.hidden { display:none; }
-    .grain { position:absolute; inset:0; pointer-events:none; opacity:.06; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); mix-blend-mode:screen; }
-    @media (max-width:767px){
-      #book-viewport { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
-      .nav { width:44px; height:44px; top:50%; }
-      #prev { left:max(8px, env(safe-area-inset-left)); }
-      #next { right:max(8px, env(safe-area-inset-right)); }
-      .hint { font-size:10px; bottom:max(10px,env(safe-area-inset-bottom)); }
+    .grain { position:absolute; inset:0; pointer-events:none; opacity:.05; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); mix-blend-mode:screen; }
+    .nav {
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:48px;
+      height:48px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      z-index:10;
+      backdrop-filter:blur(4px);
     }
-
-    @media (min-width:768px){
-      #book-scale { max-width:100vw; max-height:100vh; }
+    #prev { left:12px; }
+    #next { right:12px; }
+    .hint {
+      position:absolute;
+      bottom:max(16px, env(safe-area-inset-bottom));
+      left:50%;
+      transform:translateX(-50%);
+      color:rgba(255,255,255,.6);
+      font-size:11px;
+      letter-spacing:.5px;
+      pointer-events:none;
+      white-space:nowrap;
+      z-index:10;
     }
-    @media (prefers-reduced-motion:reduce){ * { scroll-behavior:auto !important; } }
   </style>
 </head>
 <body>
@@ -151,12 +144,12 @@
     </div>
   </div>
   <button id="prev" class="nav" aria-label="Previous step">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
   </button>
   <button id="next" class="nav" aria-label="Next step">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
   </button>
-  <div class="hint" id="hint">Swipe • click arrows • use ← →</div>
+  <div class="hint" id="hint">Swipe left or right to explore</div>
 </div>
 <script>
 (() => {
@@ -165,88 +158,84 @@
   const scaleWrap = document.querySelector('#book-scale');
   const stage = document.querySelector('#book-stage');
   const assembled = document.querySelector('#assembled');
-  const hint = document.querySelector('#hint');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const panels = {
-    p1:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653201/panel1_uakzha.jpg', p2:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel4_lmy6vm.jpg', p3:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel6_iede51.jpg',
-    p4:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653231/panel5_euwjxf.jpg', p5:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653230/panel3_puvzen.jpg', p6:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel2_cvw1fs.jpg'
+    p1:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653201/panel1_uakzha.jpg', 
+    p2:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel4_lmy6vm.jpg', 
+    p3:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel6_iede51.jpg',
+    p4:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653231/panel5_euwjxf.jpg', 
+    p5:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653230/panel3_puvzen.jpg', 
+    p6:'https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787653232/panel2_cvw1fs.jpg'
   };
-  const labels = ['Cover','Unfold 2','Unfold 3','Second phase','Unfold 5','Unfold 6','Assembled brochure'];
+
   let state = 0, animating = false;
-  let touchX=0, touchT=0, lastX=0, lastT=0;
+  let touchX = 0, touchT = 0, lastX = 0, lastT = 0;
 
   function getContentMetrics(step = state) {
-      if (step === 6) {
-        return { width:1000, height:1000 * 1448 / 2047 * 2 };
-      }
-      const count = (step === 0 || step === 3) ? 1 : (step === 1 || step === 4) ? 2 : 3;
-      return {
-        width: Math.max(PANEL_W, count * PANEL_W),
-        height: PANEL_H
-      };
+    if (step === 6) {
+      return { width:1000, height:1000 * 1448 / 2047 * 2 };
     }
+    const count = (step === 0 || step === 3) ? 1 : (step === 1 || step === 4) ? 2 : 3;
+    return {
+      width: Math.max(PANEL_W, count * PANEL_W),
+      height: PANEL_H
+    };
+  }
 
-    function fitBook(step = state, animate = false) {
-      const w = Math.max(1, viewport.clientWidth);
-      const h = Math.max(1, viewport.clientHeight);
-      const metrics = getContentMetrics(step);
+  function fitBook(step = state, animate = false) {
+    const w = Math.max(1, viewport.clientWidth);
+    const h = Math.max(1, viewport.clientHeight);
+    const metrics = getContentMetrics(step);
 
-      // Keep generous, symmetric breathing room on every device.
-      const horizontalPadding = w < 768 ? 24 : 96;
-      const verticalPadding = w < 768 ? 112 : 96;
+    const horizontalPadding = 16;
+    const verticalPadding = 90;
 
-      let sx = (w - horizontalPadding) / metrics.width;
-      let sy = (h - verticalPadding) / metrics.height;
-      let scale = Math.min(sx, sy);
+    let sx = (w - horizontalPadding) / metrics.width;
+    let sy = (h - verticalPadding) / metrics.height;
+    let scale = Math.min(sx, sy);
+    if (step === 0 || step === 3) scale = Math.min(scale, 1);
+    scale = Math.max(0.15, scale);
 
-      // Never make standalone panels larger than natural size.
-      // Multi-panel states are allowed to scale up only when there is ample room.
-      if (step === 0 || step === 3) scale = Math.min(scale, 1);
-      scale = Math.max(0.18, scale);
+    const vars = { width:1040, height:820, scale };
+    if (animate) gsap.to(scaleWrap, { ...vars, duration:0.3, ease:"power2.out", overwrite:true });
+    else gsap.set(scaleWrap, vars);
 
-      const vars = { width:1040, height:820, scale };
-      if (animate) gsap.to(scaleWrap, { ...vars, duration:0.35, ease:"power2.out", overwrite:true });
-      else gsap.set(scaleWrap, vars);
+    if (step === 6) fitAssembled(false);
+  }
 
-      if (step === 6) fitAssembled(false);
+  function fitAssembled(animate = false) {
+    const w = Math.max(1, viewport.clientWidth);
+    const h = Math.max(1, viewport.clientHeight);
+    const naturalW = 1000;
+    const naturalH = naturalW * 1448 / 2047 * 2;
+
+    const scale = Math.max(
+      0.12,
+      Math.min(
+        (w - 20) / naturalW,
+        (h - 80) / naturalH
+      )
+    );
+
+    if (animate) {
+      gsap.to(assembled, { scale, duration:0.3, ease:"power2.out", overwrite:true });
+    } else {
+      gsap.set(assembled, { scale });
     }
+  }
 
-    function fitAssembled(animate = false) {
-      const w = Math.max(1, viewport.clientWidth);
-      const h = Math.max(1, viewport.clientHeight);
-      const naturalW = 1000;
-      const naturalH = naturalW * 1448 / 2047 * 2;
+  function centerStage() {
+    gsap.set(stage, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
+    gsap.set(scaleWrap, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
+  }
 
-      const horizontalPadding = w < 768 ? 16 : 48;
-      const verticalPadding = w < 768 ? 84 : 64;
-      const scale = Math.max(
-        0.12,
-        Math.min(
-          (w - horizontalPadding) / naturalW,
-          (h - verticalPadding) / naturalH
-        )
-      );
-
-      if (animate) {
-        gsap.to(assembled, { scale, duration:0.3, ease:"power2.out", overwrite:true });
-      } else {
-        gsap.set(assembled, { scale });
-      }
-    }
-
-    function centerStage() {
-      gsap.set(stage, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
-      gsap.set(scaleWrap, { x:0, y:0, rotationX:0, rotationY:0, rotationZ:0 });
-    }
-
-    window.addEventListener('resize', () => fitBook(state, true));
-    window.addEventListener('orientationchange', () => setTimeout(() => fitBook(state, true), 120));
+  window.addEventListener('resize', () => fitBook(state, true));
+  window.addEventListener('orientationchange', () => setTimeout(() => fitBook(state, true), 150));
 
   function clearPanels() { stage.querySelectorAll('.panel-shell').forEach(el => el.remove()); }
   const imageCache = new Map();
-  // Cache the actual decoded image, not just a best-effort decode promise.
-  // This prevents Step 1 / Step 4 from ever being rendered as a blank frame.
+
   function preloadImage(src) {
     if (imageCache.has(src)) return imageCache.get(src);
     const promise = new Promise(resolve => {
@@ -265,6 +254,7 @@
     imageCache.set(src, promise);
     return promise;
   }
+
   Object.values(panels).forEach(preloadImage);
   preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0002_unqraw.jpg');
   preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0001_amyxwb.jpg');
@@ -275,218 +265,198 @@
 
   function makePanel(key, x, z=0, rot=0, hinge='center', hidden=false) {
     const el = document.createElement('div');
-    el.className='panel-shell';
-    el.dataset.key=key;
-    el.style.left='50%';
-    el.style.marginLeft='0px';
-    el.style.zIndex=String(10+Math.round(z));
+    el.className = 'panel-shell';
+    el.dataset.key = key;
+    el.style.left = '50%';
+    el.style.marginLeft = '0px';
+    el.style.zIndex = String(10 + Math.round(z));
     el.style.transformOrigin = hinge === 'left' ? 'left center' : hinge === 'right' ? 'right center' : 'center center';
-    el.style.transform=`translate(-50%,-50%) translateX(${x}px) translateZ(${z}px) rotateY(${rot}deg)`;
-    if (hidden) el.style.opacity='0';
-    const img=document.createElement('img');
-    img.src=panels[key];
-    img.alt=`NSS brochure ${key}`;
-    img.draggable=false;
-    img.decoding='async';
-    img.loading='eager';
-    img.style.visibility='hidden';
-    img.addEventListener('load', () => { img.style.visibility='visible'; }, {once:true});
-    if (img.complete && img.naturalWidth) img.style.visibility='visible';
+    el.style.transform = `translate(-50%,-50%) translateX(${x}px) translateZ(${z}px) rotateY(${rot}deg)`;
+    if (hidden) el.style.opacity = '0';
+    const img = document.createElement('img');
+    img.src = panels[key];
+    img.alt = `NSS brochure ${key}`;
+    img.draggable = false;
+    img.decoding = 'async';
+    img.loading = 'eager';
     el.appendChild(img);
-    const crease=document.createElement('div'); crease.className='crease'; crease.style.left= rot ? 'auto' : 'calc(100% - 9px)'; el.appendChild(crease);
+    const crease = document.createElement('div');
+    crease.className = 'crease';
+    crease.style.left = rot ? 'auto' : 'calc(100% - 9px)';
+    el.appendChild(crease);
     stage.appendChild(el);
     return el;
   }
 
   async function revealPanels(root=stage) {
-    const imgs=[...root.querySelectorAll('.panel-shell img')];
+    const imgs = [...root.querySelectorAll('.panel-shell img')];
     await Promise.all(imgs.map(async img => {
-      const src=img.currentSrc || img.src;
+      const src = img.currentSrc || img.src;
       await ensureImage(src);
       try { if (img.decode) await img.decode(); } catch (_) {}
-      img.style.visibility='visible';
     }));
   }
 
   function groupPositions(count) {
     const total = count * PANEL_W;
-    const start = -total/2 + PANEL_W/2;
-    return Array.from({length:count}, (_,i)=>start+i*PANEL_W);
+    const start = -total / 2 + PANEL_W / 2;
+    return Array.from({length:count}, (_, i) => start + i * PANEL_W);
   }
 
   async function renderStatic(s) {
-    // Hard reset every transform/opacity and remove every transient folding
-    // panel before drawing a new state. This is what prevents the Step 7 -> 1
-    // ghost copy of Panel 1 and the old spread from surviving the loop.
     gsap.killTweensOf(stage.querySelectorAll('.panel-shell'));
     gsap.killTweensOf([stage, scaleWrap, assembled]);
     clearPanels();
     centerStage();
     gsap.set(assembled, {opacity:0, rotationY:0, scale:1});
     assembled.classList.add('hidden');
-    assembled.setAttribute('aria-hidden','true');
+    assembled.setAttribute('aria-hidden', 'true');
 
-    if (s===0) {
-      const p=makePanel('p1',0,0,0,'center',true);
+    if (s === 0) {
+      const p = makePanel('p1', 0, 0, 0, 'center', true);
       await revealPanels(stage);
-      gsap.set(p,{x:0,y:0,rotationY:0,opacity:1,scale:1});
+      gsap.set(p, {x:0, y:0, rotationY:0, opacity:1, scale:1});
       return;
     }
-    if (s===1) { const xs=groupPositions(2); makePanel('p2',xs[0]); makePanel('p1',xs[1]); await revealPanels(stage); return; }
-    if (s===2) { const xs=groupPositions(3); makePanel('p3',xs[0]); makePanel('p2',xs[1]); makePanel('p1',xs[2]); await revealPanels(stage); return; }
-    if (s===3) {
-      const p=makePanel('p4',0,0,0,'center',true);
+    if (s === 1) { const xs = groupPositions(2); makePanel('p2', xs[0]); makePanel('p1', xs[1]); await revealPanels(stage); return; }
+    if (s === 2) { const xs = groupPositions(3); makePanel('p3', xs[0]); makePanel('p2', xs[1]); makePanel('p1', xs[2]); await revealPanels(stage); return; }
+    if (s === 3) {
+      const p = makePanel('p4', 0, 0, 0, 'center', true);
       await revealPanels(stage);
-      gsap.set(p,{x:0,y:0,rotationY:0,opacity:1,scale:1});
+      gsap.set(p, {x:0, y:0, rotationY:0, opacity:1, scale:1});
       return;
     }
-    if (s===4) { const xs=groupPositions(2); makePanel('p5',xs[0]); makePanel('p4',xs[1]); await revealPanels(stage); return; }
-    if (s===5) { const xs=groupPositions(3); makePanel('p6',xs[0]); makePanel('p5',xs[1]); makePanel('p4',xs[2]); await revealPanels(stage); return; }
-    if (s===6) {
-      // There are no folding panels underneath the assembled surface.
+    if (s === 4) { const xs = groupPositions(2); makePanel('p5', xs[0]); makePanel('p4', xs[1]); await revealPanels(stage); return; }
+    if (s === 5) { const xs = groupPositions(3); makePanel('p6', xs[0]); makePanel('p5', xs[1]); makePanel('p4', xs[2]); await revealPanels(stage); return; }
+    if (s === 6) {
       clearPanels();
       assembled.classList.remove('hidden');
-      assembled.setAttribute('aria-hidden','false');
-      gsap.set(assembled,{opacity:1,rotationY:0});
+      assembled.setAttribute('aria-hidden', 'false');
+      gsap.set(assembled, {opacity:1, rotationY:0});
       fitAssembled(false);
       return;
     }
   }
-
 
   async function animateTo(nextState, dir) {
     if (animating) return;
     animating = true;
     const old = state;
     const motion = d => reduced ? 0.01 : d;
-    const targetScale = (() => {
-      const m = getContentMetrics(nextState);
-      const hp = viewport.clientWidth < 768 ? 24 : 96;
-      const vp = viewport.clientWidth < 768 ? 112 : 96;
-      let s = Math.min(
-        (viewport.clientWidth - hp) / m.width,
-        (viewport.clientHeight - vp) / m.height
-      );
-      if (nextState === 0 || nextState === 3) s = Math.min(s, 1);
-      return Math.max(0.18, s);
-    })();
 
     try {
-      // FINAL -> STEP 1 and STEP 1 -> FINAL are isolated surface changes.
-      // The old surface is fully removed before the new one is made visible.
       if (nextState === 6) {
         gsap.killTweensOf(stage.querySelectorAll('.panel-shell'));
         clearPanels();
         assembled.classList.remove('hidden');
-        assembled.setAttribute('aria-hidden','false');
-        gsap.set(assembled,{opacity:0,scale:.92,rotationY:dir>0?5:-5});
+        assembled.setAttribute('aria-hidden', 'false');
+        gsap.set(assembled, {opacity:0, scale:.95, rotationY:dir>0?3:-3});
         fitAssembled(false);
-        await new Promise(resolve => gsap.to(assembled,{opacity:1,scale:1,rotationY:0,duration:motion(.55),ease:'power3.out',onComplete:resolve}));
-        state=nextState;
+        await new Promise(resolve => gsap.to(assembled, {opacity:1, scale:1, rotationY:0, duration:motion(.45), ease:'power3.out', onComplete:resolve}));
+        state = nextState;
         return;
       }
       if (old === 6) {
-        // Do NOT fade the assembled image over the new cover. Hide it first,
-        // then render/decode the target state, then reveal it. This completely
-        // eliminates the recurring ghost Panel 1 after the infinite loop.
         gsap.killTweensOf(assembled);
-        gsap.set(assembled,{opacity:0});
+        gsap.set(assembled, {opacity:0});
         assembled.classList.add('hidden');
-        assembled.setAttribute('aria-hidden','true');
-        gsap.set(scaleWrap,{scale:targetScale});
-        state=nextState;
+        assembled.setAttribute('aria-hidden', 'true');
+        state = nextState;
         await renderStatic(nextState);
         return;
       }
 
-      const oldPanels=[...stage.querySelectorAll('.panel-shell')];
-      const incomingKey={1:'p2',2:'p3',3:'p4',4:'p5',5:'p6'}[nextState];
+      const oldPanels = [...stage.querySelectorAll('.panel-shell')];
+      const incomingKey = {1:'p2', 2:'p3', 3:'p4', 4:'p5', 5:'p6'}[nextState];
 
-      // Reverse transitions.
       if (dir < 0) {
-        if (old===1 || old===4) {
-          const left=oldPanels[0], right=oldPanels[1];
-          const targetX=0;
-          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'},onComplete:resolve})
-            .to(left,{rotationY:-90,opacity:0,duration:motion(.52)},0)
-            .to(right,{x:targetX-groupPositions(2)[1],duration:motion(.52)},0));
-          state=nextState; await renderStatic(nextState); return;
+        if (old === 1 || old === 4) {
+          const left = oldPanels[0], right = oldPanels[1];
+          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
+            .to(left, {rotationY:-90, opacity:0, duration:motion(.45)}, 0)
+            .to(right, {x:0, duration:motion(.45)}, 0));
+          state = nextState; await renderStatic(nextState); return;
         }
-        if (old===2 || old===5) {
-          const oldTwo=groupPositions(2), oldThree=groupPositions(3);
-          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'},onComplete:resolve})
-            .to(oldPanels[0],{rotationY:-90,opacity:0,duration:motion(.55)},0)
-            .to(oldPanels[1],{x:oldTwo[0]-oldThree[1],duration:motion(.55)},0)
-            .to(oldPanels[2],{x:oldTwo[1]-oldThree[2],duration:motion(.55)},0));
-          state=nextState; await renderStatic(nextState); return;
+        if (old === 2 || old === 5) {
+          const oldTwo = groupPositions(2), oldThree = groupPositions(3);
+          await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
+            .to(oldPanels[0], {rotationY:-90, opacity:0, duration:motion(.45)}, 0)
+            .to(oldPanels[1], {x:oldTwo[0], duration:motion(.45)}, 0)
+            .to(oldPanels[2], {x:oldTwo[1], duration:motion(.45)}, 0));
+          state = nextState; await renderStatic(nextState); return;
         }
-        if (old===3) {
-          await new Promise(resolve => gsap.to(oldPanels,{opacity:0,scale:.985,duration:motion(.24),onComplete:resolve}));
-          state=nextState; await renderStatic(nextState); return;
+        if (old === 3) {
+          await new Promise(resolve => gsap.to(oldPanels, {opacity:0, scale:.98, duration:motion(.2), onComplete:resolve}));
+          state = nextState; await renderStatic(nextState); return;
         }
       }
 
-      // Standalone -> 2 panels.
-      if (old===0 || old===3) {
-        const xs=groupPositions(2), existing=oldPanels[0];
-        // Decode the incoming panel BEFORE it is allowed to become visible.
+      // Standalone -> 2 panels
+      if (old === 0 || old === 3) {
+        const xs = groupPositions(2), existing = oldPanels[0];
         await ensureImage(panels[incomingKey]);
-        const incoming=makePanel(incomingKey,xs[0],-10,90,'right',true);
-        gsap.set(existing,{x:0,opacity:1,rotationY:0,scale:1});
-        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'},onComplete:resolve})
-          .to(existing,{x:xs[1],duration:motion(.58)},0)
-          .set(incoming,{opacity:1},motion(.10))
-          .to(incoming,{rotationY:0,duration:motion(.68)},motion(.10))
-          .to(incoming.querySelector('.crease'),{opacity:0,duration:motion(.40)},motion(.25)));
-        state=nextState; await renderStatic(nextState); return;
+        const incoming = makePanel(incomingKey, xs[0], -10, 90, 'right', true);
+        gsap.set(existing, {x:0, opacity:1, rotationY:0, scale:1});
+        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
+          .to(existing, {x:xs[1], duration:motion(.5)}, 0)
+          .set(incoming, {opacity:1}, motion(.08))
+          .to(incoming, {rotationY:0, duration:motion(.55)}, motion(.08)));
+        state = nextState; await renderStatic(nextState); return;
       }
 
-      // 2 panels -> 3 panels.
-      if (old===1 || old===4) {
-        const xs=groupPositions(3), oldTwo=groupPositions(2);
+      // 2 panels -> 3 panels (FIXED ghosting/flicker by removing abrupt x reset on old panels)
+      if (old === 1 || old === 4) {
+        const xs = groupPositions(3), oldTwo = groupPositions(2);
         await ensureImage(panels[incomingKey]);
-        const incoming=makePanel(incomingKey,xs[0],-10,90,'right',true);
-        oldPanels.forEach(p=>gsap.set(p,{x:0,y:0,opacity:1,rotationY:0,rotationX:0,scale:1}));
-        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'},onComplete:resolve})
-          .to(oldPanels[0],{x:xs[1]-oldTwo[0],duration:motion(.58)},0)
-          .to(oldPanels[1],{x:xs[2]-oldTwo[1],duration:motion(.58)},0)
-          .set(incoming,{opacity:1},motion(.10))
-          .to(incoming,{rotationY:0,duration:motion(.70)},motion(.10))
-          .to(incoming.querySelector('.crease'),{opacity:0,duration:motion(.40)},motion(.25)));
-        state=nextState; await renderStatic(nextState); return;
+        const incoming = makePanel(incomingKey, xs[0], -10, 90, 'right', true);
+        
+        // Keep existing panels at their current respective positions without snapping to 0
+        oldPanels.forEach((p, idx) => {
+          gsap.set(p, {x: oldTwo[idx], y:0, opacity:1, rotationY:0, scale:1});
+        });
+
+        await new Promise(resolve => gsap.timeline({defaults:{ease:'power3.inOut'}, onComplete:resolve})
+          .to(oldPanels[0], {x: xs[1], duration:motion(.5)}, 0)
+          .to(oldPanels[1], {x: xs[2], duration:motion(.5)}, 0)
+          .set(incoming, {opacity:1}, motion(.08))
+          .to(incoming, {rotationY:0, duration:motion(.55)}, motion(.08)));
+        state = nextState; await renderStatic(nextState); return;
       }
 
-      // 3 panels -> next standalone phase.
-      if (old===2 && nextState===3) {
-        await new Promise(resolve => gsap.to(oldPanels,{opacity:0,scale:.985,duration:motion(.25),stagger:.02,onComplete:resolve}));
-        state=nextState; await renderStatic(nextState); return;
+      if (old === 2 && nextState === 3) {
+        await new Promise(resolve => gsap.to(oldPanels, {opacity:0, scale:.98, duration:motion(.2), stagger:.01, onComplete:resolve}));
+        state = nextState; await renderStatic(nextState); return;
       }
 
-      state=nextState;
+      state = nextState;
       await renderStatic(nextState);
     } finally {
-      animating=false;
+      animating = false;
       fitBook(state, false);
     }
   }
 
+  function go(delta) { const next = (state + delta + 7) % 7; animateTo(next, delta); }
+  document.querySelector('#next').addEventListener('click', () => go(1));
+  document.querySelector('#prev').addEventListener('click', () => go(-1));
 
-  function go(delta){ const next=(state+delta+7)%7; animateTo(next,delta); }
-  document.querySelector('#next').addEventListener('click',()=>go(1));
-  document.querySelector('#prev').addEventListener('click',()=>go(-1));
-  window.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){e.preventDefault();go(1)} if(e.key==='ArrowLeft'){e.preventDefault();go(-1)} });
+  viewport.addEventListener('touchstart', e => { 
+    const t = e.changedTouches[0]; 
+    touchX = lastX = t.clientX; 
+    touchT = lastT = performance.now(); 
+  }, {passive:true});
 
-  viewport.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; touchX=lastX=t.clientX; touchT=lastT=performance.now(); },{passive:true});
-  viewport.addEventListener('touchmove',e=>{ const t=e.changedTouches[0]; lastX=t.clientX; lastT=performance.now(); },{passive:true});
-  viewport.addEventListener('touchend',()=>{ const dx=lastX-touchX, dt=Math.max(1,lastT-touchT), velocity=Math.abs(dx/dt); if(Math.abs(dx)>45 || velocity>.35) go(dx<0?1:-1); },{passive:true});
+  viewport.addEventListener('touchmove', e => { 
+    const t = e.changedTouches[0]; 
+    lastX = t.clientX; 
+    lastT = performance.now(); 
+  }, {passive:true});
 
-  // Mouse wheel: one deliberate swipe = one brochure step.
-  let wheelLock=false;
-  window.addEventListener('wheel',e=>{ if(wheelLock || Math.abs(e.deltaX)+Math.abs(e.deltaY)<25) return; wheelLock=true; go(e.deltaY>0||e.deltaX>0?1:-1); setTimeout(()=>wheelLock=false,850); },{passive:true});
+  viewport.addEventListener('touchend', () => { 
+    const dx = lastX - touchX, dt = Math.max(1, lastT - touchT), velocity = Math.abs(dx / dt); 
+    if (Math.abs(dx) > 35 || velocity > 0.3) go(dx < 0 ? 1 : -1); 
+  }, {passive:true});
 
-  // Preload every brochure surface before the first visible state. This removes
-  // the blank-frame race that occurred when Step 1 or Step 4 was rendered while
-  // the browser was still decoding the JPEG.
   (async () => {
     await Promise.all(Object.values(panels).map(preloadImage));
     await preloadImage('https://res.cloudinary.com/dlnwn8bfb/image/upload/v1787658583/Digital_NSS_Brochure_page-0002_unqraw.jpg');
